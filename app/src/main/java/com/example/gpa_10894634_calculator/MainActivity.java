@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   /**
-   * Checks that all the input fields have a valid letter grade
+   * Checks that all the input fields have a valid Grade
    */
   public boolean validState() {
     for (EditText i : list) {
