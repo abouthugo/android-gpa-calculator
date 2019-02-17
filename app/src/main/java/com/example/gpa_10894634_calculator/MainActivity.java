@@ -1,3 +1,7 @@
+/**
+ * Author: Hugo Perdomo
+ * GPA Calculator using letter grades instead of a scale of 0-100
+ */
 package com.example.gpa_10894634_calculator;
 
 import android.graphics.Color;
