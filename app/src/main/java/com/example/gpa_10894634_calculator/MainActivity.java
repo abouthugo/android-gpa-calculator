@@ -6,55 +6,57 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-  TextView result;
+  TextView result_text_view;
   ConstraintLayout layout;
   ArrayList<EditText> list = new ArrayList<>();
-  HashMap<String, Double> gradeWeight = new HashMap<>();
+  Button btn;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     // Program starts
-    result = findViewById(R.id.result);
+    result_text_view = findViewById(R.id.result);
     layout = findViewById(R.id.lay);
+    btn = findViewById(R.id.button);
     getAllIns();
-    startWeights();
   }
 
   /**
-   * Triggers when the button is pressed
-   * If the inputs are valid it computes the GPA and displays it on the result label
-   * If otherwise the inputs are invalid it displays a snackbar directing the user how to fix
-   * the error
-   * @param view
+   * Triggers when the button is pressed If the inputs are valid it computes the GPA and displays it
+   * on the result_text_view label If otherwise the inputs are invalid it displays a snackbar
+   * directing the user how to fix the error
    */
   public void fun(View view) {
-    if (validState()) {
-      double gpa = computeGPA();
-      DecimalFormat df = new DecimalFormat("#.##");
-      result.setText(Double.valueOf(df.format(gpa)).toString());
-      if(gpa >= 3.20){
-        layout.setBackgroundColor(Color.parseColor("#5CD89F"));
-      } else if(gpa >= 2.44){
-        layout.setBackgroundColor(Color.parseColor("#FFD36E"));
-      } else {
-        layout.setBackgroundColor(Color.parseColor("#FF5C3E"));
-      }
-
+    if (btn.getText().toString().equalsIgnoreCase("Clear")) {
+      resetValues();
+      btn.setText("Calculate");
     } else {
-      Snackbar.make(view,
-          "Your entries are not valid, must enter capital letters with or without '+' or '-' ",
-          Snackbar.LENGTH_LONG).show();
+      if (validState()) {
+        int gpa = computeGPA();
+        String msg = "Your GPA is: " + gpa;
+        result_text_view.setText(msg);
+        btn.setText("Clear");
+        if (gpa >= 80) {
+          layout.setBackgroundColor(Color.parseColor("#5CD89F"));
+        } else if (gpa >= 61) {
+          layout.setBackgroundColor(Color.parseColor("#FFD36E"));
+        } else {
+          layout.setBackgroundColor(Color.parseColor("#FF5C3E"));
+        }
+
+      } else {
+        Snackbar.make(view,
+            "Your entries must all be in the range of 0-100 ",
+            Snackbar.LENGTH_LONG).show();
+      }
     }
   }
 
@@ -75,12 +77,12 @@ public class MainActivity extends AppCompatActivity {
    * @param in The input to check
    */
   public boolean valid(EditText in) {
-    String pattern = "[A-F][+-]{0,1}";
-    String pat = "(A\\+)|(F)[-+]{1}";
-    Pattern regex = Pattern.compile(pattern);
-    Pattern r = Pattern.compile(pat);
     String str = in.getText().toString();
-    return regex.matcher(str).matches() && !r.matcher(str).matches();
+    if (str.length() <= 0) {
+      return false;
+    }
+    int val = Integer.parseInt(str);
+    return (val >= 0 && val <= 100);
   }
 
   /**
@@ -95,42 +97,32 @@ public class MainActivity extends AppCompatActivity {
     return true;
   }
 
-  /**
-   * Populates the hash map of key value pairs with their respective weights for computation
-   */
-  public void startWeights() {
-    gradeWeight.put("A", 4.00);
-    gradeWeight.put("A-", 3.70);
-    gradeWeight.put("B+", 3.33);
-    gradeWeight.put("B", 3.00);
-    gradeWeight.put("B-", 2.70);
-    gradeWeight.put("C+", 2.30);
-    gradeWeight.put("C", 2.00);
-    gradeWeight.put("C-", 1.70);
-    gradeWeight.put("D+", 1.30);
-    gradeWeight.put("D", 1.00);
-    gradeWeight.put("D-", 1.70);
-    gradeWeight.put("F", 0.00);
-  }
 
   /**
    * Computes the gpa
-   * @return  gpa = Sigma_i^n[(grade*credit)/credit]
+   *
+   * @return gpa = (grade*number_of_courses)/(100*number_of_courses)
    */
-  public double computeGPA() {
-    double res = 0;
-    int credit = 3;
-    double grade;
+  public int computeGPA() {
+    int res = 0;
+    int grade;
     String str;
     for (EditText i : list) {
       str = i.getText().toString();
-      grade = gradeWeight.get(str);
-      res += (grade * credit);
+      grade = Integer.parseInt(str);
+      res += grade;
     }
-    res /= (credit * list.size());
+    res /= (list.size());
 
     return res;
   }
 
+  public void resetValues() {
+    for (EditText input : list) {
+      input.setText("");
+    }
+    result_text_view.setText("");
+    layout.setBackgroundColor(Color.parseColor("#FAFAFA"));
+  }
 
 }
