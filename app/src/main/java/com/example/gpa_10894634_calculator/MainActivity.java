@@ -117,7 +117,10 @@ public class MainActivity extends AppCompatActivity {
     return res;
   }
 
-  public void resetValues() {
+  /**
+   * Resets the values and the color of the screen
+   */
+  public void resetValues()    {
     for (EditText input : list) {
       input.setText("");
     }
